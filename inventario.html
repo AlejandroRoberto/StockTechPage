@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="inventario.css">
+    <title>Gestión de Inventario</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Inventario</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Color</th>
+                    <th>Longitud</th>
+                    <th>Material</th>
+                    <th>Peso</th>
+                    <th>Precio (€)</th>
+                    <th>Cantidad</th>
+                </tr>
+            </thead>
+            <tbody id="tablaInventario">
+                <!-- Filas de productos generadas dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        // Configuración de Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
+        import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdEkQzuAD_dflNmLyqwVFGw5q5p37OzCw",
+            authDomain: "usuariosstocktech.firebaseapp.com",
+            projectId: "usuariosstocktech",
+            storageBucket: "usuariosstocktech.appspot.com",
+            messagingSenderId: "125777188158",
+            appId: "1:125777188158:web:5cc4bf9f1d87c31533886f"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Referencia a la colección "productos"
+        const productosRef = collection(db, "productos");
+
+        // Cargar los datos desde Firebase
+        async function cargarInventario() {
+            try {
+                const querySnapshot = await getDocs(productosRef);
+                const tablaInventario = document.getElementById("tablaInventario");
+                tablaInventario.innerHTML = ""; // Limpiar la tabla
+
+                querySnapshot.forEach((doc) => {
+                    const nombreProducto = doc.id; // Nombre del producto (clave del documento)
+                    const data = doc.data(); // Otros campos del documento
+
+                    const fila = `
+                        <tr>
+                            <td>${nombreProducto}</td>
+                            <td>${data.color || "N/A"}</td>
+                            <td>${data.longitud || "N/A"}</td>
+                            <td>${data.material || "N/A"}</td>
+                            <td>${data.peso || "N/A"}</td>
+                            <td>${data.precio || "N/A"}</td>
+                            <td>${data.cantidad || 0}</td>
+                        </tr>
+                    `;
+                    tablaInventario.insertAdjacentHTML("beforeend", fila);
+                });
+            } catch (error) {
+                console.error("Error al cargar el inventario: ", error);
+            }
+        }
+
+        // Llamar a la función al cargar la página
+        cargarInventario();
+    </script>
+</body>
+</html>

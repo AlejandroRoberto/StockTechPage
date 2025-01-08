@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="gestionar_entregas.css">
+    <title>Recepción de Materiales</title>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDdEkQzuAD_dflNmLyqwVFGw5q5p37OzCw",
+            authDomain: "usuariosstocktech.firebaseapp.com",
+            projectId: "usuariosstocktech",
+            storageBucket: "usuariosstocktech.appspot.com",
+            messagingSenderId: "125777188158",
+            appId: "1:125777188158:web:5cc4bf9f1d87c31533886f",
+            measurementId: "G-DXTBLMW3EQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const registrarRecepcionBtn = document.getElementById('registrarRecepcion');
+            const precios = {};
+
+            // Obtener precios de la colección 'productos'
+            try {
+                const productosSnapshot = await getDocs(collection(db, "productos"));
+                productosSnapshot.forEach(doc => {
+                    precios[doc.id] = doc.data().precio;
+                });
+
+                // Actualizar la tabla con los precios
+                const filas = document.querySelectorAll("tbody tr");
+                filas.forEach(fila => {
+                    const productoNombre = fila.querySelector("td:first-child").getAttribute("data-producto");
+                    const precioCelda = fila.querySelector(".precio");
+                    if (productoNombre && precios[productoNombre]) {
+                        precioCelda.textContent = `$${precios[productoNombre].toFixed(2)}`;
+                    }
+                });
+            } catch (error) {
+                console.error("Error al obtener precios: ", error);
+            }
+
+            registrarRecepcionBtn.addEventListener('click', async () => {
+                const entregadoPor = document.getElementById('entregadoPor').value;
+                const materiales = [];
+                const productos = [
+                    { nombre: 'PUNTAL_1', cantidadId: 'cantidadPuntal1' },
+                    { nombre: 'PUNTAL_3', cantidadId: 'cantidadPuntal3' },
+                    { nombre: 'PUNTAL_4', cantidadId: 'cantidadPuntal4' },
+                    { nombre: 'PUNTAL_5', cantidadId: 'cantidadPuntal5' },
+                    { nombre: 'VALLAS_AMARILLAS_1.5', cantidadId: 'cantidadVallas15' },
+                    { nombre: 'VALLAS_AMARILLAS_2.5', cantidadId: 'cantidadVallas25' },
+                    { nombre: 'VALLAS_AMARILLAS_PVC', cantidadId: 'cantidadVallasPVC' },
+                    { nombre: 'VALLAS_REFORZADAS', cantidadId: 'cantidadVallasRef' },
+                    { nombre: 'VALLAS_SENCILLAS', cantidadId: 'cantidadVallasSenc' },
+                    { nombre: 'ZAPATAS', cantidadId: 'cantidadZapatas' }
+                ];
+
+                for (const producto of productos) {
+                    const cantidad = parseInt(document.getElementById(producto.cantidadId).value) || 0;
+                    if (cantidad > 0) {
+                        materiales.push({
+                            nombre: producto.nombre,
+                            cantidad,
+                            precio: precios[producto.nombre] || 0
+                        });
+                    }
+                }
+
+                if (entregadoPor.trim() === "" || materiales.length === 0) {
+                    alert("Por favor, ingresa el nombre de quien entrega y al menos un material.");
+                    return;
+                }
+
+                try {
+                    // Usamos 'entregadoPor' como el ID del documento
+                    const docRef = doc(db, "recepciones", entregadoPor);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists()) {
+                        // Si el documento ya existe, actualizamos los materiales y la fecha
+                        await updateDoc(docRef, {
+                            materiales: [...docSnap.data().materiales, ...materiales],
+                            fecha: new Date(),
+                        });
+                    } else {
+                        // Si el documento no existe, creamos uno nuevo
+                        await setDoc(docRef, {
+                            entregadoPor,
+                            fecha: new Date(),
+                            materiales
+                        });
+                    }
+
+                    // Actualizar la colección de productos con las cantidades
+                    for (const material of materiales) {
+                        const productoRef = doc(db, "productos", material.nombre);
+                        const productoSnap = await getDoc(productoRef);
+
+                        if (productoSnap.exists()) {
+                            const productoData = productoSnap.data();
+                            const nuevaCantidad = (productoData.cantidad || 0) + material.cantidad;
+                            await updateDoc(productoRef, { cantidad: nuevaCantidad });
+                        } else {
+                            console.error(`El producto ${material.nombre} no existe en la colección.`);
+                        }
+                    }
+
+                    // Mostrar el resumen
+                    mostrarResumen(materiales);
+
+                    alert("Recepción registrada y productos actualizados exitosamente.");
+                    document.getElementById('entregadoPor').value = "";
+                    productos.forEach(producto => document.getElementById(producto.cantidadId).value = 0);
+                } catch (error) {
+                    console.error("Error al registrar la recepción: ", error);
+                    alert("Ocurrió un error al registrar la recepción.");
+                }
+            });
+        });
+
+        function mostrarResumen(materiales) {
+            const resumenDiv = document.getElementById('resumen');
+            if (!resumenDiv) {
+                console.error("No se encuentra el contenedor de resumen.");
+                return;
+            }
+            resumenDiv.innerHTML = '';  // Limpiar el resumen anterior
+
+            let totalGeneral = 0;
+            const resumenHTML = materiales.map(material => {
+                const totalProducto = material.cantidad * material.precio;
+                totalGeneral += totalProducto;
+                return `
+                    <div>
+                        <strong>${material.nombre}</strong>: ${material.cantidad} unidades - 
+                        Precio: $${material.precio.toFixed(2)} - Total: $${totalProducto.toFixed(2)}
+                    </div>
+                `;
+            }).join('');
+
+            resumenDiv.innerHTML = `
+                <h3>Resumen de Recepción</h3>
+                ${resumenHTML}
+                <h4>Total General: $${totalGeneral.toFixed(2)}</h4>
+            `;
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Recepción de Materiales</h1>
+        <label for="entregadoPor">Entregado por:</label>
+        <input type="text" id="entregadoPor" placeholder="Ingresa el nombre de quien entrega" required>
+        <table>
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td data-producto="PUNTAL_1">Puntal 1m</td>
+                    <td><input type="number" id="cantidadPuntal1" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="PUNTAL_3">Puntal 3m</td>
+                    <td><input type="number" id="cantidadPuntal3" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="PUNTAL_4">Puntal 4m</td>
+                    <td><input type="number" id="cantidadPuntal4" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="PUNTAL_5">Puntal 5m</td>
+                    <td><input type="number" id="cantidadPuntal5" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="VALLAS_AMARILLAS_1.5">Vallas Amarillas 1.5</td>
+                    <td><input type="number" id="cantidadVallas15" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="VALLAS_AMARILLAS_2.5">Vallas Amarillas 2.5</td>
+                    <td><input type="number" id="cantidadVallas25" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="VALLAS_AMARILLAS_PVC">Vallas Amarillas PVC</td>
+                    <td><input type="number" id="cantidadVallasPVC" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="VALLAS_REFORZADAS">Vallas Reforzadas</td>
+                    <td><input type="number" id="cantidadVallasRef" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="VALLAS_SENCILLAS">Vallas Sencillas</td>
+                    <td><input type="number" id="cantidadVallasSenc" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+                <tr>
+                    <td data-producto="ZAPATAS">Zapatas</td>
+                    <td><input type="number" id="cantidadZapatas" value="0" min="0"></td>
+                    <td class="precio"></td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="registrarRecepcion">Registrar Recepción</button>
+        
+        <!-- Contenedor para mostrar el resumen -->
+        <div id="resumen"></div>
+    </div>
+</body>
+</html>

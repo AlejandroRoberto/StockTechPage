@@ -1,0 +1,93 @@
+/* Estilo global para la página */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+
+/* Contenedor principal */
+.container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Logo */
+.logo {
+    width: 300px;
+    height: 300px;
+    margin: 0 auto 20px;
+}
+
+/* Título */
+.title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Estilo del formulario */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+form input {
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+}
+
+form input:focus {
+    border-color: #FF5252;
+    box-shadow: 0 0 5px rgba(173, 25, 25, 0.5);
+}
+
+/* Estilo para el botón */
+form button {
+    padding: 12px;
+    background: #FF5252;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #FF5252;
+}
+
+/* Mensaje de error o éxito */
+#message {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 16px;
+    color: #f44336; /* Rojo para errores */
+    font-weight: bold;
+}
+
+/* Estilo adicional para mensajes de éxito */
+#message.success {
+    color: #FF5252; /* Verde para éxito */
+}
+

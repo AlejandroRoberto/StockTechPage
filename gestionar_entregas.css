@@ -1,0 +1,143 @@
+/* Estilo básico para todo el documento */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(45deg, #6a11cb, #2575fc);
+    color: #333;
+}
+
+.container {
+    width: 80%;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #ecf0f1;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2.4rem;
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+p {
+    font-size: 1.1rem;
+    text-align: center;
+    color: #ecf0f1;
+    margin-bottom: 20px;
+}
+
+/* Estilo para el input de cliente */
+label {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    display: block;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    border: 1px solid #ecf0f1;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+/* Estilo para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ecf0f1;
+}
+
+th {
+    background-color: #ecf0f1;
+    color: #000000;
+    font-weight: bold;
+}
+
+td {
+    background-color: #ecf0f1;
+}
+
+/* Estilo para el botón */
+button {
+    padding: 15px 25px;
+    background: #FF5252;
+    color: #ecf0f1;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #b41722;
+}
+
+/* Estilo para el resumen del pedido */
+.pedido-resumen {
+    background-color: #ecf0f1;
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 40px;
+}
+
+.pedido-resumen h2 {
+    font-size: 2rem;
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+#resumenLista {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+#resumenLista li {
+    font-size: 1.1rem;
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+#totalPedido {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+/* Estilo para los márgenes y separación entre secciones */
+.container, .pedido-resumen {
+    margin-top: 40px;
+}
+
+input[type="number"] {
+    width: 80px;
+    text-align: center;
+}

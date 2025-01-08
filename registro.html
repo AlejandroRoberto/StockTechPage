@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="registro.css">
+    <title>Registro</title>
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Importa las funciones necesarias de Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+
+        // Configuración de Firebase
+        const firebaseConfig = {
+          apiKey: "AIzaSyDdEkQzuAD_dflNmLyqwVFGw5q5p37OzCw",
+          authDomain: "usuariosstocktech.firebaseapp.com",
+          databaseURL: "https://usuariosstocktech-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "usuariosstocktech",
+          storageBucket: "usuariosstocktech.firebasestorage.app",
+          messagingSenderId: "125777188158",
+          appId: "1:125777188158:web:5cc4bf9f1d87c31533886f",
+          measurementId: "G-DXTBLMW3EQ"
+        };
+
+        // Inicializa Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);  // Inicializa la autenticación
+
+        // Referencia al formulario
+        const registerForm = document.getElementById('registerForm');
+        const messageDiv = document.getElementById('message');
+
+        // Maneja el envío del formulario
+        registerForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+
+          // Obtén los valores del formulario
+          const email = document.getElementById('registerEmail').value;
+          const password = document.getElementById('registerPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          // Verifica si las contraseñas coinciden
+          if (password !== confirmPassword) {
+            messageDiv.textContent = "Las contraseñas no coinciden.";
+            return;
+          }
+
+          // Crea un nuevo usuario con correo y contraseña
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              // Usuario creado con éxito
+              const user = userCredential.user;
+              alert(`¡Bienvenido, ${user.email}!`);
+              // Redirige al usuario a la página principal
+              setTimeout(() => {
+                  window.location.href = "inicio.html"; // Asegúrate de que esta ruta sea correcta
+                }, 500);
+  
+            })
+            .catch((error) => {
+              // Muestra el error si ocurre alguno
+              alert(`Error: ${error.message}`);
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo -->
+        <div class="logo">
+            <img src="LOGO_StockTech_Transparente.png" alt="Logo de la aplicación" class="logo">
+
+        </div>
+
+        <!-- Título -->
+        <div class="title">Sign Up</div>
+
+        <!-- Formulario -->
+        <form id="registerForm">
+            <input type="email" id="registerEmail" placeholder="Escribe el correo electronico" required>
+            <input type="password" id="registerPassword" placeholder="Escribe la contraseña" required>
+            <input type="password" id="confirmPassword" placeholder="Vuelve a escribir la contraseña" required>
+            <button type="submit">Registrarse</button>
+        </form>
+        <div id="message"></div>
+    </div>
+</body>
+</html>
