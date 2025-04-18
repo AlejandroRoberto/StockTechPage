@@ -62,14 +62,21 @@
                     const nombreProducto = doc.id; // Nombre del producto (clave del documento)
                     const data = doc.data(); // Otros campos del documento
 
+                // Determinar la clase según la cantidad
+                let claseFila = "";
+                if (data.cantidad === 0) {
+                    claseFila = "fila-roja";
+                } else if (data.cantidad < 50) {
+                    claseFila = "fila-naranja";
+                }
                     const fila = `
-                        <tr>
+                        <tr class="${claseFila}">
                             <td>${nombreProducto}</td>
                             <td>${data.color || "N/A"}</td>
-                            <td>${data.longitud || "N/A"}</td>
+                            <td>${data.longitud || "N/A"} m</td>
                             <td>${data.material || "N/A"}</td>
-                            <td>${data.peso || "N/A"}</td>
-                            <td>${data.precio || "N/A"}</td>
+                            <td>${data.peso || "N/A"} kg</td>
+                            <td>${data.precio || "N/A"} €</td>
                             <td>${data.cantidad || 0}</td>
                         </tr>
                     `;
