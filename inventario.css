@@ -1,5 +1,4 @@
 body {
-    width : 100%
     font-family: Arial, sans-serif;
     background: linear-gradient(45deg, #6a11cb, #2575fc);
     margin: 0;
@@ -53,4 +52,13 @@ td input[type="number"] {
     font-size: 18px;
     text-align: right;
     margin-top: 20px;
+}
+
+.fila-naranja {
+    background-color: orange;
+}
+
+.fila-roja {
+    background-color: red;
+    color: white; /* Opcional: para mejorar la visibilidad del texto */
 }
